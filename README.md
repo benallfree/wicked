@@ -2,14 +2,27 @@
 
 Wicked is a modular event-driven web framework based on the wisdom of WordPress, Drupal, Ruby on Rails, and similar architectures. In particular, Wicked focuses on being event-based. You can use Wicked to build any type of web application or mobile application using a event-driven programming techniques. If you are familiar with WordPress actions/filters or Drupal events, you will feel right at home in Wicked.
 
-## Getting Started
+## Installing
 
-Install the Wicked microkernel in your web root:
+Wicked comes with a CLI tool that gives you easy access to the Wicked core and Wicked Registry of community contributions. It manages dependencies and installs the right things in the right places.
 
-    $ get clone git@github.com:benallfree/wicked.git w
-  
-Create an `index.php` that looks something like this:
+    $ curl -L http://wickedphp.com/wicked.php.txt -O ~/bin/wicked && chmod 0755 ~/bin/wicked
 
+Then test it out:
+
+    $ wicked --help
+
+Wicked will install modules locally. By default, Wicked will use ~/wicked as your local repo path. If you don't like that, set `WICKED_HOME` to whatever you want.
+
+Once you like where it lives, try creating your first app:
+
+    $ wicked create app ~/path/to/www
+        
+
+Wicked should install any dependencies in $WICKED_HOME and then create an `~/path/to/www/index.php` that looks something like this:
+
+    $path = "~/path/to/wicked/repo"; // This is where $WICKED_HOME points to
+    set_include_path(get_include_path() . PATH_SEPARATOR . $path);
     require('w/cked.php');
     
     function hello($s)
@@ -21,15 +34,54 @@ Create an `index.php` that looks something like this:
     
     echo Wicked::do_filter('run');
 
-That's it. You just created your first Wicked web application.
+That's it. You just created your first Wicked web application. Browse to it and test it out.
 
 ## Getting More Wicked
 
-By installing the Wicked microkernel, you have done a lot. The microkernel provides the facilities for PHP observer/events and class mixins. It turns out that establishing a convention for these two decisions makes life a lot easier for endlessly extending your application.
+By installing the Wicked CLI, you have done a lot. The CLI provides access to community contributions.
+
+For example, you can browse the popular contributions like this:
+
+    $ wicked list --popular
+    
+
+    Popular Modules
+    ---------------
+    active_record 1.0.0..........42 others
+    module 1.0.0................24 others
+
+
+If you want to see who depends on who, do this:
+
+    $ wicked info ActiveRecord -v 1.0.0
+
+    active_record 1.0.0
+    ------------------
+    An mySQL-backed ORM for Wicked.
+    
+    Depends upon:
+    db ~>1.0.1
+    collections ~>1.0.2
+    inflection ~>1.0.0
+    module ~>1.0.4
+    
+    Used by:
+    account 1.0.0
+    attachment 1.0.0
+    
+If you want to install a module, it's easy:
+
+    $ wicked install active_record
+    
+That will install the latest version of active_record into $WICKED_HOME.
+
+Some contributions are "platform" contributions upon which many other contributions are built. You'll begin to see how the pieces fit together as you become more familiar with the community. 
+
+The Wicked microkernel (`w`) is at the core. It provides the facilities for PHP observer/events and class mixins. It turns out that establishing a convention for these two decisions makes life a lot easier for endlessly extending your application.
 
 ## Getting Wicked with Friends
 
-Who else is using Wicked? Browse the Wicked Registry at http://wickedphp.com. You will find tens, maybe even dozens of add-ons to use.
+Who else is using Wicked? What are they doing with it? Use your CLI tool to find out, or browse the Wicked Registry at http://wickedphp.com. You will find tens, maybe even dozens of add-ons to use.
 
 ## Extending Wicked
 
