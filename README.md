@@ -6,20 +6,25 @@ Wicked is a modular event-driven web framework based on the wisdom of WordPress,
 
 Wicked comes with a CLI tool that gives you easy access to the Wicked core and Wicked Registry of community contributions. It manages dependencies and installs the right things in the right places.
 
-    $ curl -L http://wickedphp.com/wicked.php.txt -O ~/bin/wicked && chmod 0755 ~/bin/wicked
+    $ git clone git@github.com:benallfree/wicked.git ~/wicked/w
+    $ nano ~/bin/wicked
 
-Then test it out:
 
+Copy this into `wicked`:
+
+    #!/bin/sh
+    php ~/wicked/w/cli/run.php $1 $2 $3 $4 $5 $6 $7
+
+    $ chmod 755 ~/bin/wicked
     $ wicked --help
 
 Wicked will install modules locally. By default, Wicked will use ~/wicked as your local repo path. If you don't like that, set `WICKED_HOME` to whatever you want.
 
 Once you like where it lives, try creating your first app:
 
-    $ wicked create app ~/path/to/www
+    $ wicked create stub ~/path/to/www
         
-
-Wicked should install any dependencies in $WICKED_HOME and then create an `~/path/to/www/index.php` that looks something like this:
+Wicked will install any dependencies in $WICKED_HOME and then create an `~/path/to/www/index.php` that looks something like this:
 
     $path = "~/path/to/wicked/repo"; // This is where $WICKED_HOME points to
     set_include_path(get_include_path() . PATH_SEPARATOR . $path);
@@ -79,27 +84,17 @@ Some contributions are "platform" contributions upon which many other contributi
 
 The Wicked microkernel (`w`) is at the core. It provides the facilities for PHP observer/events and class mixins. It turns out that establishing a convention for these two decisions makes life a lot easier for endlessly extending your application.
 
-## Getting Forking Wicked
+## Getting Even More Wicked
 
 If you do much developing with other people's stuff, you'll arrive at a point where you want to break out the source code and fork your own version of it so you can modify it and submit a pull request like a good citizen. Or maybe you just want to look at it.
 
-Wicked automatically looks in your $WICKED_HOME location when loading modules. But before it looks there, it will also look for a local repo. By default, the local location is `~/your/www/root/wicked`, but you can also configure as follows:
+Module forks are always installed in your local repo.
 
-    $ cd ~/my/web/root
-    $ nano wicked.config.php
-    
-    $config = array(
-      'local_repo'=>dirname(__FILE__)."/wicked",
-    );
+Wicked automatically looks in your $WICKED_HOME location when loading modules. But before it looks there, it will also look for a local repo named `wicked` in the current directory or a parent directory. If it finds one, it will assume that is the repo you mean to use. (You can override the repo locations by using a custom `Wicked` file, see below).
 
-Wicked will automatically load config settings from `wicke.config.php` if it is present at the time `Wicked::init()` is called. You can also pass `Wicked::init($config)` directly, but the benefit to a config file will be obvious after the next step.
-
-The `wicked.config.php` takes care of telling Wicked about your local rep. And remember, this is probably not even necessary as it is the default. Because the `wicked` CLI knows about `wicked.config.php`, all you have to do is change to your web root and run the `wicked fork` command to make a local forked copy of any module.
-
-    $ cd ~/my/web/root
     $ wicked fork active_record -v 1.0.0
     
-    Forking active_record-1.0.0 to wicked/activerecord-1.0.0
+    Forking active_record-1.0.0 to local wicked/activerecord-1.0.0
     
 Now when you load `active_record`, it will load from the local forked copy instead.
 

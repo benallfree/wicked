@@ -1,11 +1,12 @@
 <?
 
-class EventMixin extends WickedBase
+class EventMixin extends Mixin
 {
   protected static  $events;
   static function init()
   {
     self::$events = array();
+    parent::init();
   }
   
   static function register_event($event_type, $event_name, $callback, $weight=10)
@@ -13,7 +14,7 @@ class EventMixin extends WickedBase
     self::ensure_key(self::$events, $event_type);
     self::ensure_key(self::$events[$event_type], $event_name);
     self::$events[$event_type][$event_name][] = array($callback, $weight);
-    usort(self::$events[$event_type][$event_name], array(self, 'event_sort'));
+    usort(self::$events[$event_type][$event_name], 'self::event_sort');
   }
 
   protected static function event_sort($a,$b)
@@ -29,6 +30,8 @@ class EventMixin extends WickedBase
     array_shift($args);
     array_shift($args);
     if(count($args)==0) $args=array(null);
+    if(!isset(self::$events[$event_type])) return $args[0];
+    if(!isset(self::$events[$event_type][$event_name])) return $args[0];
     $f = self::$events[$event_type][$event_name];
     foreach(self::$events[$event_type][$event_name] as $callback_info)
     {

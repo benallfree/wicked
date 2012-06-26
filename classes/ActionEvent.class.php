@@ -11,6 +11,6 @@ class ActionEvent extends EventMixin
   {
     $args = func_get_args();
     array_unshift($args, 'Action');
-    return call_user_func_array(array(parent, 'do_event'), $args);
+    return call_user_func_array('parent::do_event', $args);
   }
 }
