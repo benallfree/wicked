@@ -79,6 +79,31 @@ Some contributions are "platform" contributions upon which many other contributi
 
 The Wicked microkernel (`w`) is at the core. It provides the facilities for PHP observer/events and class mixins. It turns out that establishing a convention for these two decisions makes life a lot easier for endlessly extending your application.
 
+## Getting Forking Wicked
+
+If you do much developing with other people's stuff, you'll arrive at a point where you want to break out the source code and fork your own version of it so you can modify it and submit a pull request like a good citizen. Or maybe you just want to look at it.
+
+Wicked automatically looks in your $WICKED_HOME location when loading modules. But before it looks there, it will also look for a local repo. By default, the local location is `~/your/www/root/wicked`, but you can also configure as follows:
+
+    $ cd ~/my/web/root
+    $ nano wicked.config.php
+    
+    $config = array(
+      'local_repo'=>dirname(__FILE__)."/wicked",
+    );
+
+Wicked will automatically load config settings from `wicke.config.php` if it is present at the time `Wicked::init()` is called. You can also pass `Wicked::init($config)` directly, but the benefit to a config file will be obvious after the next step.
+
+The `wicked.config.php` takes care of telling Wicked about your local rep. And remember, this is probably not even necessary as it is the default. Because the `wicked` CLI knows about `wicked.config.php`, all you have to do is change to your web root and run the `wicked fork` command to make a local forked copy of any module.
+
+    $ cd ~/my/web/root
+    $ wicked fork active_record -v 1.0.0
+    
+    Forking active_record-1.0.0 to wicked/activerecord-1.0.0
+    
+Now when you load `active_record`, it will load from the local forked copy instead.
+
+
 ## Getting Wicked with Friends
 
 Who else is using Wicked? What are they doing with it? Use your CLI tool to find out, or browse the Wicked Registry at http://wickedphp.com. You will find tens, maybe even dozens of add-ons to use.

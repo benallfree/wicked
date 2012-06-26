@@ -1,11 +1,3 @@
 <?
 
-require_once('classes/Wicked.class.php');
-
-
-Wicked::init(array(
-  'mixins'=>array(
-    'FilterEvent',
-    'ActionEvent',
-  )
-));
+require_once('classes/W.class.php');

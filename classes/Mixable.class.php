@@ -5,6 +5,7 @@ require_once('WickedBase.class.php');
 class Mixable extends WickedBase
 {
   static $mixin_classes = array();
+  static $is_initialized = false;
   
   static function add_mixin($class_name)
   {
@@ -18,10 +19,15 @@ class Mixable extends WickedBase
     {
       call_user_func_array(array($class_name, 'init'), $args);
     }
+    self::$is_initialized = true;
   }
   
   static function __callstatic($name, $args)
   {
+    if(!self::$is_initialized)
+    {
+      call_user_func(array(get_called_class(), 'init'));
+    }
     foreach(self::$mixin_classes as $class_name)
     {
       if(array_search($name, get_class_methods($class_name))!==false)
