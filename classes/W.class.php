@@ -1,5 +1,4 @@
 <?
-
 require_once('Mixable.class.php');
 
 class W extends Mixable
@@ -14,10 +13,13 @@ class W extends Mixable
   static $root_fpath;
   
   static $modules = array();
+  
+  static $autoloads = array();
 
   protected static function init($config=array())
   {
     self::$root_fpath = realpath($_SERVER['SITE_HTMLROOT']);
+    self::$autoloads[] = dirname(__FILE__);
     $config = array_merge(self::$config_defaults, $config);
     spl_autoload_register('W::autoload');    
     parent::init(self::ensure_key($config, 'mixins'));
@@ -32,11 +34,14 @@ class W extends Mixable
   
   protected static function autoload($class_name)
   {
-    $fname = dirname(__FILE__)."/{$class_name}.class.php";
-    if(file_exists($fname))
+    foreach(self::$autoloads as $fpath)
     {
-      require($fname);
-      return true;
+      $fname = $fpath."/{$class_name}.class.php";
+      if(file_exists($fname))
+      {
+        require($fname);
+        return true;
+      }
     }
     return false;
   }
@@ -46,19 +51,22 @@ class W extends Mixable
     self::ensure_init();
     if(file_exists($module_name)) return $module_name; // If file path is passed, just return it
     $paths = explode(PATH_SEPARATOR, get_include_path());
+    $latest_version_int = 0;
     foreach($paths as $path)
     {
       $module_glob = $path."/{$module_name}*";
       $files = glob($module_glob, GLOB_ONLYDIR);
       if(!$files) continue;
-      $latest_version_int = 0;
       foreach($files as $file)
       {
         list($name,$version) = explode('-', basename($file).'-');
-        if(!$version && $desired_version == null && $name == $module_name)
+        if($name != $module_name) continue; // Not a match;
+        if(!$version && $desired_version == null)
         {
           return $file;
         }
+        
+        var_dump($version);
         list($major, $minor, $dot) = explode('.', $version);
         $version_int = (int)sprintf("%03d%03d%03d", $major, $minor, $dot);
         
@@ -80,24 +88,40 @@ class W extends Mixable
     $module_fpath = self::find_module($module_name, $version);
     $parts = pathinfo($module_name);
     $module_name = $parts['filename'];
-
-    if(!$module_fpath) trigger_error("Wicked Module '{$module_name}' not found.", E_USER_ERROR);
+    if(!$module_fpath) 
+    {
+      trigger_error("Wicked Module '{$module_name}' not found.", E_USER_ERROR);
+    }
     
-    $config = array(
+    $config_defaults = array(
       'format'=>'1.0.0',
       'fpath'=>$module_fpath,
       'vpath'=>substr($module_fpath, strlen(self::$root_fpath)),
-    );
-    // Load the metadata file
-    @include($module_fpath."/Wicked");
-    $config = W::do_filter('config', $config, $module_name);
-
-    $config_defaults = array(
+      'cache_fpath'=>self::$root_fpath."/cache/{$module_name}",
+      'cache_vpath'=>"/cache/{$module_name}",
       'requires'=>array(),
     );
+    
+    // Add autoloads
+    $autoload_fpath = $module_fpath."/classes";
+    if(file_exists($autoload_fpath))
+    {
+      self::$autoloads[] = $autoload_fpath;
+    }
+    
+    // Load the metadata file
+    $config_fpath = $module_fpath."/Wicked";
+    $config = array();
+    if(file_exists($config_fpath))
+    {
+      require($config_fpath);
+    }
     $config = array_merge($config_defaults, $config);
+    $config = W::do_filter('config', $config, $module_name);
+
 
     self::$modules[$module_name] = $config;
+
     // Handle requires
     foreach($config['requires'] as $req_info)
     {
@@ -110,6 +134,10 @@ class W extends Mixable
       }
       self::load($req_name, $req_version);
     }
-    @include($module_fpath."/preload.php");
+    $load_fpath = $module_fpath."/load.php";
+    if(file_exists($load_fpath))
+    {
+      require($load_fpath);
+    }
   }
 }
