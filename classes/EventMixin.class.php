@@ -1,4 +1,5 @@
 <?
+require('Mixin.class.php');
 
 class EventMixin extends Mixin
 {
@@ -6,7 +7,6 @@ class EventMixin extends Mixin
   static function init()
   {
     self::$events = array();
-    parent::init();
   }
   
   static function register_event($event_type, $event_name, $callback, $weight=10)
