@@ -2,6 +2,7 @@
 require_once('Mixable.class.php');
 require_once('ActionEvent.class.php');
 require_once('FilterEvent.class.php');
+require_once('ModuleLoader.class.php');
 
 class W extends Mixable
 {

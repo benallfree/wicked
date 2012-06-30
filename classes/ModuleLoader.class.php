@@ -2,14 +2,12 @@
 
 class ModuleLoader extends Mixin
 {
-  static $__prefix = 'module';
   static $modules = array();
 
   static function load($module_name, $version=null)
   {
     if(isset(self::$modules[$module_name] )) return;
     
-    self::ensure_init();
     $module_fpath = self::find_module($module_name, $version);
     $parts = pathinfo($module_name);
     $module_name = $parts['filename'];
@@ -21,13 +19,12 @@ class ModuleLoader extends Mixin
     $config_defaults = array(
       'format'=>'1.0.0',
       'fpath'=>$module_fpath,
-      'vpath'=>substr($module_fpath, strlen(self::$root_fpath)),
-      'cache_fpath'=>self::$root_fpath."/cache/{$module_name}",
+      'vpath'=>substr($module_fpath, strlen(W::$root_fpath)),
+      'cache_fpath'=>W::$root_fpath."/cache/{$module_name}",
       'cache_vpath'=>"/cache/{$module_name}",
       'requires'=>array(),
     );
     
-    W::do_action('before_module_loaded', $module_name, $config_defaults);
     
     // Load the metadata file
     $config_fpath = $module_fpath."/Wicked";
@@ -37,12 +34,8 @@ class ModuleLoader extends Mixin
       require($config_fpath);
     }
     $config = array_merge($config_defaults, $config);
-    $config = W::do_filter('module_config', $config, $module_name);
-
-
+    $config = W::filter('module_config', $config, $module_name);
     self::$modules[$module_name] = $config;
-
-    W::do_action('after_module_config', $module_name);
 
     // Handle requires
     foreach($config['requires'] as $req_info)
@@ -58,25 +51,24 @@ class ModuleLoader extends Mixin
     }
     
     // Module loader
+    W::action('before_module_loaded', $module_name, $config);
     $load_fpath = $module_fpath."/load.php";
     if(file_exists($load_fpath))
     {
       require($load_fpath);
     }
-    
-    W::do_action('module_loaded', $module_name);
+    W::action('after_module_loaded', $module_name, $config);
     
   }
   
   private static function find_module($module_name, $desired_version = null)
   {
-    self::ensure_init();
     if(file_exists($module_name)) return $module_name; // If file path is passed, just return it
     $paths = explode(PATH_SEPARATOR, get_include_path());
     $latest_version_int = 0;
     foreach($paths as $path)
     {
-      $module_glob = $path."/{$module_name}*";
+      $module_glob = $path."/wicked/{$module_name}*";
       $files = glob($module_glob, GLOB_ONLYDIR);
       if(!$files) continue;
       foreach($files as $file)

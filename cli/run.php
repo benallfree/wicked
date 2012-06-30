@@ -152,6 +152,22 @@ function help($repo_fpath)
   puts("Repo Location: {$repo_fpath}");
 }
 
+function cmd_install($repo_fpath, $args)
+{
+  $repo_name = array_shift($args);
+  $repos = array(
+    'request'=>'git@github.com:benallfree/wicked-request.git',
+    'path_utils'=>'git@github.com:benallfree/wicked-path-utils.git',
+    'class_lazyloader'=>'git@github.com:benallfree/wicked-class-lazyloader.git',
+    'string'=>'git@github.com:benallfree/wicked-string.git',
+    'url'=>'git@github.com:benallfree/wicked-url.git',
+    'debug'=>'git@github.com:benallfree/wicked-debug.git',
+    'presentation'=>'git@github.com:benallfree/wicked-presentation.git',
+    'request'=>'git@github.com:benallfree/wicked-request.git',
+  );
+  cmd("git clone ? ?", $repos[$repo_name], $repo_fpath."/$repo_name");
+}
+
 $repo_fpath = $_SERVER['HOME']."/wicked";
 if(isset($_SERVER['WICKED_HOME']))
 {
@@ -163,6 +179,9 @@ array_shift($argv);
 $arg = array_shift($argv);
 switch($arg)
 {
+  case 'install':
+    cmd_install($repo_fpath, $argv);
+    break;
   case 'up':
     cmd_up($repo_fpath, $argv);
     break;
