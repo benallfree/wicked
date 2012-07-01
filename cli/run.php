@@ -53,6 +53,7 @@ function cmd($cmd)
 function cmd_up($repo_fpath, $argv)
 {
   require('Wicked');
+  return;
   foreach($dependencies as $d)
   {
     list($module_name, $version) = $d;
@@ -72,12 +73,34 @@ function cmd_up($repo_fpath, $argv)
   }
 }
 
+function conditional_write($fpath, $s, $default)
+{
+  if(file_exists($fpath) && confirm("File exists {$fpath}, overwrite?", $default))
+  {
+    puts("Overwriting $fpath");
+  } else {
+    puts("Skipping $fpath");
+    return false;
+  }
+  file_put_contents($fpath, $s);
+  return true;
+}
+
+function confirm($message, $default='y')
+{
+  puts($message . ( $default=='y' ? ' [Y/n]' : ' [y/N]'));
+  flush();
+  $confirmation  =  strtolower(trim( fgets( STDIN ) ));
+  if(!$confirmation) $confirmation = $default;
+  return $confirmation == 'y';
+}
+
 function cmd_create($repo_fpath, $argv)
 {
   $arg = array_shift($argv);
   switch($arg)
   {
-    case 'app':
+    case 'stub':
       $arg = array_shift($argv);
       $dst_fpath = realpath(str_replace("~/", $_SERVER['HOME'], $arg));
       $cfg = <<<CFG
@@ -98,9 +121,14 @@ CFG;
       //file_put_contents($dst_fpath."/.htaccess", $cfg);
       $php = <<<PHP
 <?
-set_include_path(get_include_path() . PATH_SEPARATOR . dirname(__FILE__)."/wicked" . PATH_SEPARATOR . "{$repo_fpath}");
-require('w/cked.php');
+set_include_path(get_include_path() . PATH_SEPARATOR . dirname(__FILE__) . PATH_SEPARATOR . "{$repo_fpath}/..");
+require('wicked/w/cked.php');
+PHP;
+      conditional_write($dst_fpath."/w.php", $php, 'y');
 
+      $php = <<<PHP
+<?
+require('w.php');
 function hello(\$s)
 {
 return "Hello, world!";
@@ -110,7 +138,7 @@ W::register_filter('run', 'hello');
 
 echo W::do_filter('run');
 PHP;
-      file_put_contents($dst_fpath."/index.php", $php);
+      conditional_write($dst_fpath."/index.php", $php, 'n');
       touch($dst_fpath."/Wicked");
       cmd_up($repo_fpath, $argv);
       break;
@@ -127,6 +155,32 @@ function cmd_update($repo_fpath, $args)
     cmd("git pull origin master");
   }
   chdir('..');
+
+function help($repo_fpath)
+{
+  puts("Wicked 1.0.0 CLI Tool");
+  puts("---------------------");
+  puts("Repo Location: {$repo_fpath}");
+}
+
+function cmd_install($repo_fpath, $args)
+{
+  $repo_name = array_shift($args);
+  $repos = array(
+    'request'=>'git@github.com:benallfree/wicked-request.git',
+    'path_utils'=>'git@github.com:benallfree/wicked-path-utils.git',
+    'class_lazyloader'=>'git@github.com:benallfree/wicked-class-lazyloader.git',
+    'string'=>'git@github.com:benallfree/wicked-string.git',
+    'url'=>'git@github.com:benallfree/wicked-url.git',
+    'debug'=>'git@github.com:benallfree/wicked-debug.git',
+    'presentation'=>'git@github.com:benallfree/wicked-presentation.git',
+    'request'=>'git@github.com:benallfree/wicked-request.git',
+    'haml'=>'git@github.com:benallfree/wicked-haml.git',
+    'php_sandbox'=>'git@github.com:benallfree/wicked-php-sandbox.git',
+    'sass'=>'git@github.com:benallfree/wicked-sass.git',
+    'collections'=>'git@github.com:benallfree/wicked-collections.git',
+  );
+  cmd("git clone ? ?", $repos[$repo_name], $repo_fpath."/$repo_name");
 }
 
 $repo_fpath = $_SERVER['HOME']."/wicked";
@@ -140,11 +194,8 @@ array_shift($argv);
 $arg = array_shift($argv);
 switch($arg)
 {
-  case '--version':
-    
-    break;
-  case '--help':
-    puts("Help!");
+  case 'install':
+    cmd_install($repo_fpath, $argv);
     break;
   case 'up':
     cmd_up($repo_fpath, $argv);
@@ -155,5 +206,6 @@ switch($arg)
   case 'update':
     cmd_update($repo_fpath, $argv);
     break;
-  
+  default:
+    help($repo_fpath);  
 }

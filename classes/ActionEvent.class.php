@@ -1,4 +1,5 @@
 <?
+require_once('EventMixin.class.php');
 
 class ActionEvent extends EventMixin
 {
@@ -7,7 +8,7 @@ class ActionEvent extends EventMixin
     self::register_event('Action', $action_name, $callback, $weight);
   }
 
-  static function do_action($action_name)
+  static function action($action_name)
   {
     $args = func_get_args();
     array_unshift($args, 'Action');

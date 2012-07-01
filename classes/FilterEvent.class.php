@@ -1,4 +1,5 @@
 <?
+require_once('EventMixin.class.php');
 
 class FilterEvent extends EventMixin
 {
@@ -7,7 +8,7 @@ class FilterEvent extends EventMixin
     self::register_event('Filter', $filter_name, $callback, $weight);
   }
 
-  static function do_filter($filter_name)
+  static function filter($filter_name)
   {
     $args = func_get_args();
     array_unshift($args, 'Filter');

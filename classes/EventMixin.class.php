@@ -1,4 +1,5 @@
 <?
+require('Mixin.class.php');
 
 class EventMixin extends Mixin
 {
@@ -6,11 +7,11 @@ class EventMixin extends Mixin
   static function init()
   {
     self::$events = array();
-    parent::init();
   }
   
   static function register_event($event_type, $event_name, $callback, $weight=10)
   {
+    if(!call_user_func_array('method_exists', explode('::',$callback))) W::error("Callback $callback does not exist. Did you spell it correctly?");
     self::ensure_key(self::$events, $event_type);
     self::ensure_key(self::$events[$event_type], $event_name);
     self::$events[$event_type][$event_name][] = array($callback, $weight);

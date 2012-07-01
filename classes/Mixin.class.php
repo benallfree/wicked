@@ -2,10 +2,9 @@
 
 class Mixin extends WickedBase
 {
-  static $config;
+  static $__prefix = '';
   
-  static function init($config = array())
+  static function init()
   {
-    self::$config = $config;
   }
 }

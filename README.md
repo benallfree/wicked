@@ -2,34 +2,64 @@
 
 Wicked is a modular event-driven web framework based on the wisdom of WordPress, Drupal, Ruby on Rails, and similar architectures. In particular, Wicked focuses on being event-based. You can use Wicked to build any type of web application or mobile application using a event-driven programming techniques. If you are familiar with WordPress actions/filters or Drupal events, you will feel right at home in Wicked.
 
-## Installing
+## Installing Wicked in a Custom Location
 
 Wicked comes with a CLI tool that gives you easy access to the Wicked core and Wicked Registry of community contributions. It manages dependencies and installs the right things in the right places.
 
-    $ git clone git@github.com:benallfree/wicked.git ~/wicked/w
-    $ nano ~/bin/wicked
+Add this to the bottom of your `~/.bash_profile`, choosing your own location of course:
+
+    # This is the location of the repository where 
+    # Wicked modules are downloaded and installed.
+    export WICKED_HOME=~/wicked
+    
+    # This is your local bin folder where the wicked
+    # CLI stub will reside
+    export PATH=$PATH:~/bin
 
 
-Copy this into `wicked`:
+Install the Wicked core:  
+
+    git clone git@github.com:benallfree/wicked.git $WICKED_HOME/w
+    
+Now open `nano` or your favorite editor and create a `wicked` CLI stub
+
+    nano ~/bin/wicked
 
     #!/bin/sh
-    php ~/wicked/w/cli/run.php $1 $2 $3 $4 $5 $6 $7
+    php $WICKED_HOME/w/cli/run.php $1 $2 $3 $4 $5 $6 $7
 
-    $ chmod 755 ~/bin/wicked
-    $ wicked --help
+Adjust permissions:
 
-Wicked will install modules locally. By default, Wicked will use ~/wicked as your local repo path. If you don't like that, set `WICKED_HOME` to whatever you want.
+    chmod 755 ~/bin/wicked
 
-Once you like where it lives, try creating your first app:
+And now try the following command:
 
-    $ wicked create stub ~/path/to/www
+    which wicked
+    wicked --help
+
+    Wicked 1.x.x CLI Tool
+    ---------------------
+    Repo Location: <$WICKED_HOME>
+  
+That's it! You installed Wicked in a custom location.
+
+## Hello World
+
+Try creating your first app:
+
+    cd ~/path/to/my/new/www
+    wicked create stub
+    ls
+
+You should see two new files:
+
+    index.php
+    w.php
+
+Let's look at `index.php`:
+
+    require('w.php');
         
-Wicked will install any dependencies in $WICKED_HOME and then create an `~/path/to/www/index.php` that looks something like this:
-
-    $path = "~/path/to/wicked/repo"; // This is where $WICKED_HOME points to
-    set_include_path(get_include_path() . PATH_SEPARATOR . $path);
-    require('w/cked.php');
-    
     function hello($s)
     {
       return "Hello, world!";
@@ -39,7 +69,30 @@ Wicked will install any dependencies in $WICKED_HOME and then create an `~/path/
     
     echo Wicked::do_filter('run');
 
-That's it. You just created your first Wicked web application. Browse to it and test it out.
+Well thats pretty easy. If you browse to index.php or run `php index.php` from the command line, you should see Hello World.
+
+Let's take a look under the hood at `w.php`:
+
+    $path = "/path/to/wicked/repo"; // This is where $WICKED_HOME points to
+    set_include_path(get_include_path() . PATH_SEPARATOR . $path);
+    require('w/cked.php');
+
+As you can see, `w.php` is a pretty simple bootstrap itself. It includes the Wicked core and nothing more.
+
+## Including Wicked in an Existing Application
+
+Wicked plays well with others. It will not pollute your global function or variable namespace, but does make use of non-namespaced classes. Wicked add-on modules may do the same thing.
+
+Create the same stub as you did before. Wicked will not overwrite an existing `index.php` or `w.php` without asking.
+
+Once it has created `w.php`, you will need to include `w.php` in the file of your choice.
+
+
+
+Begin by 
+
+
+
 
 ## Getting More Wicked
 
