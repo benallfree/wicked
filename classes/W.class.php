@@ -15,10 +15,12 @@ class W extends Mixable
   );
   
   static $root_fpath;
+  static $root_vpath;
   
   static function init($config=array())
   {
     self::$root_fpath = realpath($_SERVER['SITE_HTMLROOT']);
+    self::$root_vpath = '';
     $config = array_merge(self::$config_defaults, $config);
     foreach($config['mixins'] as $class_name)
     {

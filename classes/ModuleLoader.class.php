@@ -4,6 +4,12 @@ class ModuleLoader extends Mixin
 {
   static $modules = array();
 
+  static function &module($module_name)
+  {
+    if(!isset(self::$modules[$module_name])) return array();
+    return self::$modules[$module_name];
+  }
+  
   static function load($module_name, $version=null)
   {
     if(isset(self::$modules[$module_name] )) return;

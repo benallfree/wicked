@@ -164,6 +164,10 @@ function cmd_install($repo_fpath, $args)
     'debug'=>'git@github.com:benallfree/wicked-debug.git',
     'presentation'=>'git@github.com:benallfree/wicked-presentation.git',
     'request'=>'git@github.com:benallfree/wicked-request.git',
+    'haml'=>'git@github.com:benallfree/wicked-haml.git',
+    'php_sandbox'=>'git@github.com:benallfree/wicked-php-sandbox.git',
+    'sass'=>'git@github.com:benallfree/wicked-sass.git',
+    'collections'=>'git@github.com:benallfree/wicked-collections.git',
   );
   cmd("git clone ? ?", $repos[$repo_name], $repo_fpath."/$repo_name");
 }
