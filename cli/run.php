@@ -38,7 +38,7 @@ function cmd($cmd)
 {
   $args = func_get_args();
   $s = call_user_func_array('interpolate', $args);
-  echo($s."\n");
+  puts($cmd);
   exec($s . " 2>&1",$output, $result);
   if($result!=0)
   {
@@ -117,6 +117,18 @@ PHP;
   }
 }
 
+function cmd_update($repo_fpath, $args)
+{
+  foreach(glob($repo_fpath."/*", GLOB_ONLYDIR) as $fname)
+  {
+    puts(basename($fname));
+    if(!file_exists($fname."/.git")) continue;
+    chdir($fname);
+    cmd("git pull origin master");
+  }
+  chdir('..');
+}
+
 $repo_fpath = $_SERVER['HOME']."/wicked";
 if(isset($_SERVER['WICKED_HOME']))
 {
@@ -139,6 +151,9 @@ switch($arg)
     break;
   case 'create':
     cmd_create($repo_fpath, $argv);
+    break;
+  case 'update':
+    cmd_update($repo_fpath, $argv);
     break;
   
 }
