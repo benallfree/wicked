@@ -199,6 +199,8 @@ function cmd_install($repo_fpath, $args)
     'php_sandbox'=>'git@github.com:benallfree/wicked-php-sandbox.git',
     'sass'=>'git@github.com:benallfree/wicked-sass.git',
     'collections'=>'git@github.com:benallfree/wicked-collections.git',
+    'coolbook'=>'git@github.com:benallfree/wicked-coolbook.git',
+    'monochrome'=>'git@github.com:benallfree/wicked-monochrome.git',
   );
   cmd("git clone ? ?", $repos[$repo_name], $repo_fpath."/$repo_name");
 }
