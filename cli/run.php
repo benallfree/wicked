@@ -205,6 +205,8 @@ function cmd_install($repo_fpath, $args)
     'db'=>'git@github.com:benallfree/wicked-db.git',
     'activerecord'=>'git@github.com:benallfree/wicked-activerecord.git',
     'exec'=>'git@github.com:benallfree/wicked-exec.git',
+    'cookie_session'=>'git@github.com:benallfree/wicked-cookie-session.git',
+    'inflection'=>'git@github.com:benallfree/wicked-inflection.git',
   );
   cmd("git clone ? ?", $repos[$repo_name], $repo_fpath."/$repo_name");
 }
