@@ -201,6 +201,10 @@ function cmd_install($repo_fpath, $args)
     'collections'=>'git@github.com:benallfree/wicked-collections.git',
     'coolbook'=>'git@github.com:benallfree/wicked-coolbook.git',
     'monochrome'=>'git@github.com:benallfree/wicked-monochrome.git',
+    'account'=>'git@github.com:benallfree/wicked-account.git',
+    'db'=>'git@github.com:benallfree/wicked-db.git',
+    'activerecord'=>'git@github.com:benallfree/wicked-activerecord.git',
+    'exec'=>'git@github.com:benallfree/wicked-exec.git',
   );
   cmd("git clone ? ?", $repos[$repo_name], $repo_fpath."/$repo_name");
 }

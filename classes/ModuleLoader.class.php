@@ -31,7 +31,6 @@ class ModuleLoader extends Mixin
       'requires'=>array(),
     );
     
-    
     // Load the metadata file
     $config_fpath = $module_fpath."/Wicked";
     $config = array();
@@ -43,6 +42,14 @@ class ModuleLoader extends Mixin
     $config = W::filter('module_config', $config, $module_name);
     self::$modules[$module_name] = $config;
 
+
+    $load_fpath = $module_fpath."/preload.php";
+    if(file_exists($load_fpath))
+    {
+      require($load_fpath);
+    }
+
+
     // Handle requires
     foreach($config['requires'] as $req_info)
     {
@@ -52,6 +59,10 @@ class ModuleLoader extends Mixin
       } else {
         $req_name = $req_info;
         $req_version = null;
+      }
+      if(!self::find_module($req_name, $req_version))
+      {
+        W::error("Module $module_name requires $req_name, but $req_name does not exist.");
       }
       self::load($req_name, $req_version);
     }
@@ -83,10 +94,10 @@ class ModuleLoader extends Mixin
         if($name != $module_name) continue; // Not a match;
         if(!$version && $desired_version == null)
         {
-          return $file;
+          return realpath($file);
         }
         
-        var_dump($version);
+        W::dprint($version);
         list($major, $minor, $dot) = explode('.', $version);
         $version_int = (int)sprintf("%03d%03d%03d", $major, $minor, $dot);
         
@@ -99,6 +110,6 @@ class ModuleLoader extends Mixin
       }
     }
     if($latest_version_int==0) return null;
-    return $module_fpath;
+    return realpath($module_fpath);
   }
 }
