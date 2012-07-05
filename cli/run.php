@@ -4,6 +4,15 @@ error_reporting(E_ALL|E_STRICT);
 ini_set('dislay_errors', 'On');
 date_default_timezone_set('UTC');
 
+function dprint($s, $should_exit = true)
+{
+  ob_start();
+  var_dump($s);
+  $s = ob_get_clean();
+  puts($s);
+  if($should_exit) die;
+}
+
 function puts($s)
 {
   echo($s."\n");
@@ -38,7 +47,7 @@ function cmd($cmd)
 {
   $args = func_get_args();
   $s = call_user_func_array('interpolate', $args);
-  puts($cmd);
+  puts($s);
   exec($s . " 2>&1",$output, $result);
   if($result!=0)
   {
@@ -153,8 +162,18 @@ function cmd_update($repo_fpath, $args)
     if(!file_exists($fname."/.git")) continue;
     chdir($fname);
     cmd("git pull origin master");
+    $config_defaults = array('requires'=>array());
+    $config = array();
+    if(file_exists($fname."/Wicked")) require($fname."/Wicked");
+    $config = array_merge($config_defaults, $config);
+    foreach($config['requires'] as $r)
+    {
+      if(file_exists($repo_fpath."/$r")) continue;
+      cmd_install($repo_fpath, array($r));
+    }
   }
   chdir('..');
+}
 
 function help($repo_fpath)
 {
@@ -166,6 +185,7 @@ function help($repo_fpath)
 function cmd_install($repo_fpath, $args)
 {
   $repo_name = array_shift($args);
+  puts("Installing $repo_name");
   $repos = array(
     'request'=>'git@github.com:benallfree/wicked-request.git',
     'path_utils'=>'git@github.com:benallfree/wicked-path-utils.git',
