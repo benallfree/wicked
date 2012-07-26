@@ -10,10 +10,13 @@ class ModuleLoader extends Mixin
     return self::$modules[$module_name];
   }
   
-  static function load($module_name, $version=null, $config_override = array())
+  static function load($module_name, $config_override = array(), $version = null)
   {
     if(isset(self::$modules[$module_name] )) return;
-    
+    if(!is_array($config_override))
+    {
+      trigger_error("Wicked Module '{$module_name}' did not supply an array for custom config.", E_USER_ERROR);
+    }
     $module_fpath = self::find_module($module_name, $version);
     $parts = pathinfo($module_name);
     $module_name = $parts['filename'];
@@ -66,7 +69,7 @@ class ModuleLoader extends Mixin
       {
         W::error("Module $module_name requires $req_name, but $req_name does not exist.");
       }
-      self::load($req_name, $req_version);
+      self::load($req_name, array(), $req_version);
     }
     
     // Module loader
@@ -99,7 +102,7 @@ class ModuleLoader extends Mixin
           return realpath($file);
         }
         
-        W::dprint($version);
+        W::dprint("Detected a version in $file");
         list($major, $minor, $dot) = explode('.', $version);
         $version_int = (int)sprintf("%03d%03d%03d", $major, $minor, $dot);
         

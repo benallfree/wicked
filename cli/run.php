@@ -52,8 +52,9 @@ function cmd($cmd)
   if($result!=0)
   {
     puts("Error: $result");
-    puts($s);
-    puts($output);
+    puts("Command failed: $s");
+    puts("Command output: ");
+    var_dump($output);
     die;
   }
   return $output;
@@ -185,6 +186,12 @@ function help($repo_fpath)
 function cmd_install($repo_fpath, $args)
 {
   $repo_name = array_shift($args);
+  $fname = $repo_fpath."/$repo_name";
+  if(file_exists($fname))
+  {
+    puts ("Skipping $repo_name, already installed.");
+    return;
+  }
   puts("Installing $repo_name");
   $repos = array(
     'request'=>'git@github.com:benallfree/wicked-request.git',
@@ -209,7 +216,16 @@ function cmd_install($repo_fpath, $args)
     'inflection'=>'git@github.com:benallfree/wicked-inflection.git',
     'http'=>'git@github.com:benallfree/wicked-http.git',
   );
-  cmd("git clone ? ?", $repos[$repo_name], $repo_fpath."/$repo_name");
+  cmd("git clone ? ?", $repos[$repo_name], $fname);
+  $config = array();
+  if(file_exists($fname."/Wicked")) require($fname."/Wicked");
+  $config = array_merge($config_defaults, $config);
+  foreach($config['requires'] as $r)
+  {
+    if(file_exists($repo_fpath."/$r")) continue;
+    cmd_install($repo_fpath, array($r));
+  }
+  
 }
 
 $repo_fpath = $_SERVER['HOME']."/wicked";
