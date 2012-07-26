@@ -10,7 +10,7 @@ class ModuleLoader extends Mixin
     return self::$modules[$module_name];
   }
   
-  static function load($module_name, $version=null)
+  static function load($module_name, $version=null, $config_override = array())
   {
     if(isset(self::$modules[$module_name] )) return;
     
@@ -38,7 +38,9 @@ class ModuleLoader extends Mixin
     {
       require($config_fpath);
     }
+    $config = array_merge($config, $config_override);
     $config = array_merge($config_defaults, $config);
+
     $config = W::filter('module_config', $config, $module_name);
     self::$modules[$module_name] = $config;
 
