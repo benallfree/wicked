@@ -6,7 +6,11 @@ class ModuleLoader extends Mixin
 
   static function &module($module_name)
   {
-    if(!isset(self::$modules[$module_name])) return array();
+    if(!isset(self::$modules[$module_name]))
+    {
+      $ret = array();
+      return $ret;
+    }
     return self::$modules[$module_name];
   }
   

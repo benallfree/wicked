@@ -215,6 +215,7 @@ function cmd_install($repo_fpath, $args)
     'cookie_session'=>'git@github.com:benallfree/wicked-cookie-session.git',
     'inflection'=>'git@github.com:benallfree/wicked-inflection.git',
     'http'=>'git@github.com:benallfree/wicked-http.git',
+    'date'=>'git@github.com:benallfree/wicked-date.git',
   );
   cmd("git clone ? ?", $repos[$repo_name], $fname);
   $config = array();
