@@ -219,6 +219,7 @@ function cmd_install($repo_fpath, $args)
   );
   cmd("git clone ? ?", $repos[$repo_name], $fname);
   $config = array();
+  $config_defaults = array();
   if(file_exists($fname."/Wicked")) require($fname."/Wicked");
   $config = array_merge($config_defaults, $config);
   foreach($config['requires'] as $r)
