@@ -47,7 +47,6 @@ function cmd($cmd)
 {
   $args = func_get_args();
   $s = call_user_func_array('interpolate', $args);
-  puts($s);
   exec($s . " 2>&1",$output, $result);
   if($result!=0)
   {
@@ -183,6 +182,41 @@ function help($repo_fpath)
   puts("Repo Location: {$repo_fpath}");
 }
 
+function cmd_status($repo_fpath, $args)
+{
+  foreach(glob($repo_fpath."/*", GLOB_ONLYDIR) as $fname)
+  {
+    if(!file_exists($fname."/.git")) continue;
+    chdir($fname);
+    $output = cmd("git status");
+    $statuses = array();
+    $flags = array(
+      'push'=>array('ahead of'),
+      'commit'=>array('Changed', 'modified'),
+    );
+    foreach($flags as $status=>$regexes)
+    {
+      foreach($output as $line)
+      {
+        foreach($regexes as $regex)
+        {
+          preg_match("/{$regex}/", $line, $matches);
+          if(count($matches)>0)
+          {
+            $statuses[] = $status;
+            break 2;
+          }
+        }
+      }
+    }
+    if(count($statuses)>0)
+    {
+      puts(basename($fname) . ' - needs ' . join(', ', $statuses));
+    }
+  }
+  chdir('..');  
+}
+
 function cmd_install($repo_fpath, $args)
 {
   $repo_name = array_shift($args);
@@ -252,6 +286,9 @@ switch($arg)
     break;
   case 'update':
     cmd_update($repo_fpath, $argv);
+    break;
+  case 'status':
+    cmd_status($repo_fpath, $argv);
     break;
   default:
     help($repo_fpath);  
