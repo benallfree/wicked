@@ -250,6 +250,7 @@ function cmd_install($repo_fpath, $args)
     'inflection'=>'git@github.com:benallfree/wicked-inflection.git',
     'http'=>'git@github.com:benallfree/wicked-http.git',
     'date'=>'git@github.com:benallfree/wicked-date.git',
+    'error_logger'=>'git@github.com:benallfree/wicked-error-logger.git',
   );
   cmd("git clone ? ?", $repos[$repo_name], $fname);
   $config = array();
