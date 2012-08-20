@@ -8,8 +8,7 @@ class ModuleLoader extends Mixin
   {
     if(!isset(self::$modules[$module_name]))
     {
-      $ret = array();
-      return $ret;
+      trigger_error("Wicked Module '{$module_name}' is not loaded.");
     }
     return self::$modules[$module_name];
   }
@@ -49,7 +48,7 @@ class ModuleLoader extends Mixin
     $config = array_merge($config_defaults, $config);
 
     $config = W::filter('module_config', $config, $module_name);
-    self::$modules[$module_name] = $config;
+    self::$modules[$module_name] = &$config;
 
 
     $load_fpath = $module_fpath."/preload.php";

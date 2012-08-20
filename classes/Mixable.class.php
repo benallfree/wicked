@@ -6,6 +6,29 @@ class Mixable extends WickedBase
 {
   static $mixin_classes = array();
   
+  static function export($mixin_name)
+  {
+    $methods = get_class_methods($mixin_name);
+    $prefix = eval("return {$mixin_name}::\$__prefix;");
+    foreach($methods as $m)
+    {
+      $f = $m;
+      if($prefix)
+      {
+        $f = "{$prefix}_{$m}";
+      }
+      if(function_exists($f)) continue;
+      $php = "
+        function $m()
+        {
+          \$args = func_get_args();
+          return call_user_func_array('W::$f', \$args);
+        }
+      ";
+      eval($php);
+    }
+  }
+  
   static function add_mixin($class_name)
   {
     self::$mixin_classes[] = $class_name;

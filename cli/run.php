@@ -186,7 +186,11 @@ function cmd_status($repo_fpath, $args)
 {
   foreach(glob($repo_fpath."/*", GLOB_ONLYDIR) as $fname)
   {
-    if(!file_exists($fname."/.git")) continue;
+    if(!file_exists($fname."/.git")) 
+    {
+      puts(basename($fname) . ' - needs init ');
+      continue;
+    }
     chdir($fname);
     $output = cmd("git status");
     $statuses = array();
@@ -251,10 +255,16 @@ function cmd_install($repo_fpath, $args)
     'http'=>'git@github.com:benallfree/wicked-http.git',
     'date'=>'git@github.com:benallfree/wicked-date.git',
     'error_logger'=>'git@github.com:benallfree/wicked-error-logger.git',
+    'meta'=>'git@github.com:benallfree/wicked-meta.git',
+    'swiftmail'=>'git@github.com:benallfree/wicked-swiftmail.git',
+    'utf8'=>'git@github.com:benallfree/wicked-utf8.git',
+    'portal'=>'git@github.com:benallfree/wicked-portal.git',
   );
   cmd("git clone ? ?", $repos[$repo_name], $fname);
   $config = array();
-  $config_defaults = array();
+  $config_defaults = array(
+    'requires'=>array(),
+  );
   if(file_exists($fname."/Wicked")) require($fname."/Wicked");
   $config = array_merge($config_defaults, $config);
   foreach($config['requires'] as $r)
