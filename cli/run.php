@@ -84,12 +84,17 @@ function cmd_up($repo_fpath, $argv)
 
 function conditional_write($fpath, $s, $default)
 {
-  if(file_exists($fpath) && confirm("File exists {$fpath}, overwrite?", $default))
+  if(file_exists($fpath))
   {
-    puts("Overwriting $fpath");
+    if(confirm("File exists {$fpath}, overwrite?", $default))
+    {
+      puts("Overwriting $fpath");
+    } else {
+      puts("Skipping $fpath");
+      return false;
+    }
   } else {
-    puts("Skipping $fpath");
-    return false;
+    puts("Writing $fpath");
   }
   file_put_contents($fpath, $s);
   return true;
@@ -127,7 +132,7 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule . /index.php [L]
 </IfModule>
 CFG;
-      //file_put_contents($dst_fpath."/.htaccess", $cfg);
+      conditional_write($dst_fpath."/.htaccess", $cfg, 'n');
       $php = <<<PHP
 <?
 set_include_path(get_include_path() . PATH_SEPARATOR . dirname(__FILE__) . PATH_SEPARATOR . "{$repo_fpath}/..");
@@ -145,7 +150,7 @@ return "Hello, world!";
 
 W::register_filter('run', 'hello');
 
-echo W::do_filter('run');
+echo W::filter('run');
 PHP;
       conditional_write($dst_fpath."/index.php", $php, 'n');
       touch($dst_fpath."/Wicked");
