@@ -49,7 +49,7 @@ class Mixable extends WickedBase
         }
       }
     }
-    trigger_error('Non-existent method was called in class '.__CLASS__.': '.$name, E_USER_ERROR);
+    trigger_error('Wicked: Non-existent method was called in class '.__CLASS__.': '.$name, E_USER_ERROR);
   }
   
   

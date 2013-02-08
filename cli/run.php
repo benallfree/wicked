@@ -59,28 +59,6 @@ function cmd($cmd)
   return $output;
 }
 
-function cmd_up($repo_fpath, $argv)
-{
-  require('Wicked');
-  return;
-  foreach($dependencies as $d)
-  {
-    list($module_name, $version) = $d;
-    $fpath = $repo_fpath."/{$module_name}";
-    $lookup = array(
-      'w'=>'git@github.com:benallfree/wicked.git',
-    );
-    if(file_exists($fpath))
-    {
-      puts("found");
-    } else {
-      cmd("git clone ? ?", $lookup[$module_name], $fpath);
-      require($fpath."/Wicked");
-      $dst_fpath = $fpath."-{$config['version']}";
-      //rename($fpath, $dst_fpath);
-    }
-  }
-}
 
 function conditional_write($fpath, $s, $default)
 {
@@ -109,7 +87,7 @@ function confirm($message, $default='y')
   return $confirmation == 'y';
 }
 
-function cmd_create($repo_fpath, $argv)
+function cmd_macro($repo_fpath, $argv)
 {
   $arg = array_shift($argv);
   switch($arg)
@@ -180,11 +158,81 @@ function cmd_update($repo_fpath, $args)
   chdir('..');
 }
 
+function repos()
+{
+  return array(
+    'request'=>'git@github.com:benallfree/wicked-request.git',
+    'path_utils'=>'git@github.com:benallfree/wicked-path-utils.git',
+    'class_lazyloader'=>'git@github.com:benallfree/wicked-class-lazyloader.git',
+    'string'=>'git@github.com:benallfree/wicked-string.git',
+    'url'=>'git@github.com:benallfree/wicked-url.git',
+    'debug'=>'git@github.com:benallfree/wicked-debug.git',
+    'presentation'=>'git@github.com:benallfree/wicked-presentation.git',
+    'request'=>'git@github.com:benallfree/wicked-request.git',
+    'haml'=>'git@github.com:benallfree/wicked-haml.git',
+    'php_sandbox'=>'git@github.com:benallfree/wicked-php-sandbox.git',
+    'sass'=>'git@github.com:benallfree/wicked-sass.git',
+    'collections'=>'git@github.com:benallfree/wicked-collections.git',
+    'coolbook'=>'git@github.com:benallfree/wicked-coolbook.git',
+    'monochrome'=>'git@github.com:benallfree/wicked-monochrome.git',
+    'account'=>'git@github.com:benallfree/wicked-account.git',
+    'db'=>'git@github.com:benallfree/wicked-db.git',
+    'activerecord'=>'git@github.com:benallfree/wicked-activerecord.git',
+    'exec'=>'git@github.com:benallfree/wicked-exec.git',
+    'cookie_session'=>'git@github.com:benallfree/wicked-cookie-session.git',
+    'inflection'=>'git@github.com:benallfree/wicked-inflection.git',
+    'http'=>'git@github.com:benallfree/wicked-http.git',
+    'date'=>'git@github.com:benallfree/wicked-date.git',
+    'error_logger'=>'git@github.com:benallfree/wicked-error-logger.git',
+    'meta'=>'git@github.com:benallfree/wicked-meta.git',
+    'swiftmail'=>'git@github.com:benallfree/wicked-swiftmail.git',
+    'utf8'=>'git@github.com:benallfree/wicked-utf8.git',
+    'portal'=>'git@github.com:benallfree/wicked-portal.git',
+  );
+}
+function cmd_list($repo_fpath, $argv)
+{
+  puts("Available Modules\n");
+  foreach(repos() as $name=>$git_address)
+  {
+    puts($name . " - " . $git_address);
+  }
+}
+
 function help($repo_fpath)
 {
   puts("Wicked 1.0.0 CLI Tool");
   puts("---------------------");
   puts("Repo Location: {$repo_fpath}");
+  $commands = array(
+    'list'=>array(
+      'List available modules',
+      'wicked list',
+    ),
+    'install' => array(
+      "Install a module (and its dependencies)",
+      "wicked install <modulename>",
+    ),
+    'macro'=>array(
+      "Run a macro.\n\t\tstub - Create a stand-alone Wicked application stub",
+      'wicked macro <macroname>'
+    ),
+    'update'=>array(
+      'Update all installed modules to the latest git versions (including dependencies)',
+      'wicked update',
+    ),
+    'status'=>array(
+      "List the git status of all installed modules. Good for pushing changes.",
+      'wicked status',
+    ),
+  );
+  puts("Available Commands\n");
+  foreach($commands as $name=>$info)
+  {
+    puts($name);
+    puts("\t".$info[0]);
+    puts("\tExample usage: ".$info[1]);
+  }
 }
 
 function cmd_status($repo_fpath, $args)
@@ -236,35 +284,8 @@ function cmd_install($repo_fpath, $args)
     return;
   }
   puts("Installing $repo_name");
-  $repos = array(
-    'request'=>'git@github.com:benallfree/wicked-request.git',
-    'path_utils'=>'git@github.com:benallfree/wicked-path-utils.git',
-    'class_lazyloader'=>'git@github.com:benallfree/wicked-class-lazyloader.git',
-    'string'=>'git@github.com:benallfree/wicked-string.git',
-    'url'=>'git@github.com:benallfree/wicked-url.git',
-    'debug'=>'git@github.com:benallfree/wicked-debug.git',
-    'presentation'=>'git@github.com:benallfree/wicked-presentation.git',
-    'request'=>'git@github.com:benallfree/wicked-request.git',
-    'haml'=>'git@github.com:benallfree/wicked-haml.git',
-    'php_sandbox'=>'git@github.com:benallfree/wicked-php-sandbox.git',
-    'sass'=>'git@github.com:benallfree/wicked-sass.git',
-    'collections'=>'git@github.com:benallfree/wicked-collections.git',
-    'coolbook'=>'git@github.com:benallfree/wicked-coolbook.git',
-    'monochrome'=>'git@github.com:benallfree/wicked-monochrome.git',
-    'account'=>'git@github.com:benallfree/wicked-account.git',
-    'db'=>'git@github.com:benallfree/wicked-db.git',
-    'activerecord'=>'git@github.com:benallfree/wicked-activerecord.git',
-    'exec'=>'git@github.com:benallfree/wicked-exec.git',
-    'cookie_session'=>'git@github.com:benallfree/wicked-cookie-session.git',
-    'inflection'=>'git@github.com:benallfree/wicked-inflection.git',
-    'http'=>'git@github.com:benallfree/wicked-http.git',
-    'date'=>'git@github.com:benallfree/wicked-date.git',
-    'error_logger'=>'git@github.com:benallfree/wicked-error-logger.git',
-    'meta'=>'git@github.com:benallfree/wicked-meta.git',
-    'swiftmail'=>'git@github.com:benallfree/wicked-swiftmail.git',
-    'utf8'=>'git@github.com:benallfree/wicked-utf8.git',
-    'portal'=>'git@github.com:benallfree/wicked-portal.git',
-  );
+  $repos = repos();
+
   cmd("git clone ? ?", $repos[$repo_name], $fname);
   $config = array();
   $config_defaults = array(
@@ -291,13 +312,13 @@ array_shift($argv);
 $arg = array_shift($argv);
 switch($arg)
 {
+  case 'list':
+    cmd_list($repo_fpath, $argv);
+    break;
   case 'install':
     cmd_install($repo_fpath, $argv);
     break;
-  case 'up':
-    cmd_up($repo_fpath, $argv);
-    break;
-  case 'create':
+  case 'macro':
     cmd_create($repo_fpath, $argv);
     break;
   case 'update':

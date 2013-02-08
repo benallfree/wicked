@@ -1,8 +1,19 @@
 # Wicked - The Event-Driven Web Framework
 
-Wicked is a modular event-driven web framework based on the wisdom of WordPress, Drupal, Ruby on Rails, and similar architectures. In particular, Wicked focuses on being event-based. You can use Wicked to build any type of web application or mobile application using a event-driven programming techniques. If you are familiar with WordPress actions/filters or Drupal events, you will feel right at home in Wicked.
+Wicked is a modular event-driven web framework based on the wisdom of WordPress, Drupal, Ruby on Rails, and similar architectures. In particular, Wicked focuses on being event-based. You can use Wicked to build any type of web application or mobile application using event-driven programming techniques. If you are familiar with WordPress actions/filters or Drupal events, you will feel right at home in Wicked.
 
-## Installing Wicked in a Custom Location
+## Features and Benefits
+
+Wicked is designed to be lightweight, feature-rich, and performant.
+
+* Small, lightweight microkernel - almost everything in Wicked is an optional module
+* Designed to leverage PHP bytecode caching. Wicked uses standard `require` statements and writes all code generation to files rather than using `eval`
+* Lazy loading - Wicked lazy-loads all modules and features only when they are referenced in the execution path
+* Event-driven architecture - Wicked is event-driven, which means extensibility to your heart's content
+* Clean namespacing - Wicked uses lazy-loaded dynamic class extensions so your functions don't pollute global namespace
+* Ready for the grid - Wicked is designed with grid-computing in mind
+
+## Installing Wicked
 
 Wicked comes with a CLI tool that gives you easy access to the Wicked core and Wicked Registry of community contributions. It manages dependencies and installs the right things in the right places.
 
@@ -41,14 +52,16 @@ And now try the following command:
     ---------------------
     Repo Location: <$WICKED_HOME>
   
-That's it! You installed Wicked in a custom location.
+That's it! You installed Wicked and can use it from any of your web applications.
+
+Continue reading for a short tutorial.
 
 ## Hello World
 
 Try creating your first app:
 
     cd ~/path/to/my/new/www
-    wicked create stub
+    wicked macro stub
     ls
 
 You should see two new files:
@@ -81,18 +94,11 @@ As you can see, `w.php` is a pretty simple bootstrap itself. It includes the Wic
 
 ## Including Wicked in an Existing Application
 
-Wicked plays well with others. It will not pollute your global function or variable namespace, but does make use of non-namespaced classes. Wicked add-on modules may do the same thing.
+Wicked plays well with others. It will not pollute your global function or variable namespace, but does make use of non-namespaced classes on a very limited basis. Wicked add-on modules may do the same thing.
 
 Create the same stub as you did before. Wicked will not overwrite an existing `index.php` or `w.php` without asking.
 
 Once it has created `w.php`, you will need to include `w.php` in the file of your choice.
-
-
-
-Begin by 
-
-
-
 
 ## Getting More Wicked
 
@@ -100,42 +106,22 @@ By installing the Wicked CLI, you have done a lot. The CLI provides access to co
 
 For example, you can browse the popular contributions like this:
 
-    $ wicked list --popular
+    $ wicked list
     
 
-    Popular Modules
+    Available Modules
     ---------------
-    active_record 1.0.0..........42 others
-    module 1.0.0................24 others
+    request - git@github.com:benallfree/wicked-request.git
+    path_utils - git@github.com:benallfree/wicked-path-utils.git
+    ....
+        
+Installing a module is easy:
 
-
-If you want to see who depends on who, do this:
-
-    $ wicked info ActiveRecord -v 1.0.0
-
-    active_record 1.0.0
-    ------------------
-    An mySQL-backed ORM for Wicked.
+    $ wicked install request
     
-    Depends upon:
-    db ~>1.0.1
-    collections ~>1.0.2
-    inflection ~>1.0.0
-    module ~>1.0.4
-    
-    Used by:
-    account 1.0.0
-    attachment 1.0.0
-    
-If you want to install a module, it's easy:
-
-    $ wicked install active_record
-    
-That will install the latest version of active_record into $WICKED_HOME.
+That will install the latest version of `request` into $WICKED_HOME.
 
 Some contributions are "platform" contributions upon which many other contributions are built. You'll begin to see how the pieces fit together as you become more familiar with the community. 
-
-The Wicked microkernel (`w`) is at the core. It provides the facilities for PHP observer/events and class mixins. It turns out that establishing a convention for these two decisions makes life a lot easier for endlessly extending your application.
 
 ## Getting Even More Wicked
 
@@ -145,41 +131,18 @@ Module forks are always installed in your local repo.
 
 Wicked automatically looks in your $WICKED_HOME location when loading modules. But before it looks there, it will also look for a local repo named `wicked` in the current directory or a parent directory. If it finds one, it will assume that is the repo you mean to use. (You can override the repo locations by using a custom `Wicked` file, see below).
 
-    $ wicked fork active_record -v 1.0.0
-    
-    Forking active_record-1.0.0 to local wicked/activerecord-1.0.0
-    
-Now when you load `active_record`, it will load from the local forked copy instead.
-
-
-## Getting Wicked with Friends
-
-Who else is using Wicked? What are they doing with it? Use your CLI tool to find out, or browse the Wicked Registry at http://wickedphp.com. You will find tens, maybe even dozens of add-ons to use.
-
 ## Extending Wicked
 
-You can extend Wicked directly simply by using its built-in event system as shown above. But consider standing on the shoulders of giants instead.
+Look at existing Wicked modules to understand how to design your own.
 
-You probably want to make a (Wicked Module)[http://github.com/benallfree/wicked-module] instead of writing against the raw Wicked class. The module framework makes some intelligent decisions about file convention organization, and dozens of other compatible modules already exist. Almost any conceivable extension to Wicked can be accomplished through the very popular Wicked Module add-on. Check that out.
-
-To contribute a Wicked add-on, or an add-on that is compatible with (or minor to) some other Wicked add-on, use these steps:
+To contribute a Wicked module:
 
 1. Create a github repo
 1. Add your `wicked` meta file
 1. Push your changes
-1. Submit your github URL to the [Wicked Registry](http://wickedphp.com)
+1. Submit your github URL to me
 
 Once added to the registry, your repo will automatically be scanned for the `wicked` metadata file.
-
-Your metadata file should look like this:
-
-    Format=1.0
-    Version=1.0.0
-    Dependency[] = <user contrib> [<version qualifier>]
-    Dependency[] = <user contrib> [<version qualifier>]
-    Dependency[] = <user contrib> [<version qualifier>]
-
-Where `<user contrib>` is a Wicked Registry contribution name and the optional `<version qualifier>` states which version (or range) of the contrib is required for your contribution to work. These version markers translate into git tags tracked by the registry.
 
 ## Contributing to the Wicked Core
 
